@@ -70,4 +70,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Interested> interestedUsers;
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }
+

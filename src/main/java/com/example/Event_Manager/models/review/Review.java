@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -41,9 +41,9 @@ public class Review {
 
     @Column(nullable = false, name = "created_at", updatable = false)
     @CreationTimestamp
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }
