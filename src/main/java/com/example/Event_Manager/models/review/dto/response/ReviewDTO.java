@@ -1,7 +1,11 @@
 package com.example.Event_Manager.models.review.dto.response;
 
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 
+
+@Builder
 public record ReviewDTO(
         Long id,
         Long eventId,

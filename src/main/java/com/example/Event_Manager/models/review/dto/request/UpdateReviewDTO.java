@@ -9,7 +9,6 @@ public record UpdateReviewDTO(
         @NotNull(message = "Category ID is required")
         Long categoryId,
 
-        @NotNull(message = "Rating is required")
         @Min(value = 1, message = "Rating must be at least 1")
         @Max(value = 10, message = "Rating must be at most 10")
         Integer rating,
