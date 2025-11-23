@@ -104,4 +104,14 @@ public class EventControllerAdvice {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
+
+    @ExceptionHandler(EventSummaryException.class)
+    public ResponseEntity<ErrorResponse> handleEventSummaryException(EventSummaryException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 }

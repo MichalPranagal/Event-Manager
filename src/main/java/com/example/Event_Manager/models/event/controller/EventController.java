@@ -3,6 +3,7 @@ package com.example.Event_Manager.models.event.controller;
 import com.example.Event_Manager.models.event.dto.request.CreateEventDTO;
 import com.example.Event_Manager.models.event.dto.request.UpdateEventDTO;
 import com.example.Event_Manager.models.event.dto.response.EventDTO;
+import com.example.Event_Manager.models.event.dto.response.EventSummaryDTO;
 import com.example.Event_Manager.models.event.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -92,5 +93,11 @@ public class EventController implements EventApi {
             @PathVariable Long organizerId
     ) {
         return ResponseEntity.ok(eventService.getEventsByOrganizer(organizerId));
+    }
+
+    @GetMapping("/{eventId}/summary")
+    public ResponseEntity<EventSummaryDTO> getEventSummary(
+            @PathVariable Long eventId) {
+        return ResponseEntity.ok(eventService.getEventSummary(eventId));
     }
 }

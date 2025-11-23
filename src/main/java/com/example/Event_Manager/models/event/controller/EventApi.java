@@ -3,6 +3,7 @@ package com.example.Event_Manager.models.event.controller;
 import com.example.Event_Manager.models.event.dto.request.CreateEventDTO;
 import com.example.Event_Manager.models.event.dto.request.UpdateEventDTO;
 import com.example.Event_Manager.models.event.dto.response.EventDTO;
+import com.example.Event_Manager.models.event.dto.response.EventSummaryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -73,4 +74,12 @@ public interface EventApi {
             description = "Retrieves events by organizer ID.")
     @ApiResponse(responseCode = "200", description = "Events retrieved successfully")
     ResponseEntity<List<EventDTO>> getEventsByOrganizer(Long organizerId);
+
+    @Operation(summary = "Get event summary",
+            description = "Retrieves a summary of the event by its ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event summary retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Event not found")
+    })
+    ResponseEntity<EventSummaryDTO> getEventSummary(Long eventId);
 }

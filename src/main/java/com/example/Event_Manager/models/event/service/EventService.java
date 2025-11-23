@@ -7,6 +7,7 @@ import com.example.Event_Manager.models.event.Event;
 import com.example.Event_Manager.models.event.dto.request.CreateEventDTO;
 import com.example.Event_Manager.models.event.dto.request.UpdateEventDTO;
 import com.example.Event_Manager.models.event.dto.response.EventDTO;
+import com.example.Event_Manager.models.event.dto.response.EventSummaryDTO;
 import com.example.Event_Manager.models.event.exceptions.EventNotFoundException;
 import com.example.Event_Manager.models.event.mapper.EventMapper;
 import com.example.Event_Manager.models.event.repository.EventRepository;
@@ -152,5 +153,13 @@ public class EventService implements IEventService {
                 .filter(event -> event.getOrganizer() != null && event.getOrganizer().getId().equals(organizerId))
                 .map(eventMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public EventSummaryDTO getEventSummary(Long eventId) {
+        eventValidation.checkIfIdValid(eventId);
+        Event event = eventRepository.findEventById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event not found in database."));
+        return eventMapper.toSummaryDTO(event);
     }
 }
