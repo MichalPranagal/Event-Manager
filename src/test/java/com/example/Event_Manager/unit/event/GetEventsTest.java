@@ -18,6 +18,7 @@ import com.example.Event_Manager.models.category.validation.CategoryValidation;
 import com.example.Event_Manager.models.venue.dto.response.VenueDTO;
 import com.example.Event_Manager.models.venue.validation.VenueValidation;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Unit Tests for getting Events")
 public class GetEventsTest {
 
     @Mock

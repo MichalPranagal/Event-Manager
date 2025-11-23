@@ -13,6 +13,7 @@ import com.example.Event_Manager.models.user.User;
 import com.example.Event_Manager.models.user.enums.Role;
 import com.example.Event_Manager.models.venue.Venue;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +29,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Unit Tests for Event deletion")
 public class DeleteEventTest {
 
     @Mock
@@ -100,6 +102,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should delete event successfully")
     void deleteEvent_Success() {
         // Given
         Long eventId = 1L;
@@ -118,6 +121,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should throw EventNotFoundException when event does not exist")
     void deleteEvent_EventNotFound_ThrowsException() {
         // Given
         Long eventId = 999L;
@@ -137,6 +141,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should throw EventNotFoundException for negative event id")
     void deleteEvent_InvalidEventId_NegativeId_ThrowsException() {
         // Given
         Long invalidEventId = -1L;
@@ -156,6 +161,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should throw EventNotFoundException for null event id")
     void deleteEvent_NullEventId_ThrowsException() {
         // Given
         doThrow(new EventNotFoundException("Event with this id is not in database."))
@@ -173,6 +179,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should throw EventNotFoundException for zero event id")
     void deleteEvent_ZeroEventId_ThrowsException() {
         // Given
         Long eventId = 0L;
@@ -192,6 +199,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should throw RuntimeException when repository delete fails")
     void deleteEvent_RepositoryDeleteFailure_ThrowsException() {
         // Given
         Long eventId = 1L;
@@ -213,6 +221,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should verify order of operations during event deletion")
     void deleteEvent_VerifyOperationOrder() {
         // Given
         Long eventId = 1L;
@@ -233,6 +242,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should stop at first validation failure during deletion")
     void deleteEvent_MultipleValidationFailures_StopsAtFirstFailure() {
         // Given
         Long eventId = -1L;
@@ -253,6 +263,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should throw EventNotFoundException when exists check returns false")
     void deleteEvent_ExistsCheckReturnsFalse_ThrowsException() {
         // Given
         Long eventId = 999L;
@@ -272,6 +283,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should throw EventNotFoundException when valid id is not in database")
     void deleteEvent_ValidIdButNotInDatabase_ThrowsException() {
         // Given
         Long eventId = 100L;
@@ -291,6 +303,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should throw RuntimeException when repository exists check fails")
     void deleteEvent_RepositoryExistsCheckThrowsException() {
         // Given
         Long eventId = 1L;
@@ -311,6 +324,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should delete event with large id successfully")
     void deleteEvent_LargeEventId_Success() {
         // Given
         Long largeEventId = 999999999L;
@@ -329,6 +343,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should validate each time when deleteEvent is called multiple times")
     void deleteEvent_CalledMultipleTimes_ValidatesEachTime() {
         // Given
         Long eventId1 = 1L;
@@ -352,6 +367,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should call validation before repository exists check")
     void deleteEvent_ValidationCheckExecutedBeforeExistsCheck() {
         // Given
         Long eventId = 1L;
@@ -370,6 +386,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should call deleteById with correct parameter")
     void deleteEvent_DeleteByIdCalledWithCorrectParameter() {
         // Given
         Long eventId = 42L;
@@ -386,6 +403,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should not interact with repository when validation fails")
     void deleteEvent_NoInteractionWithRepositoryWhenValidationFails() {
         // Given
         Long eventId = -5L;
@@ -402,6 +420,7 @@ public class DeleteEventTest {
     }
 
     @Test
+    @DisplayName("Should rollback transaction on exception during delete")
     void deleteEvent_TransactionalBehavior_RollbackOnException() {
         // Given
         Long eventId = 1L;
@@ -420,3 +439,4 @@ public class DeleteEventTest {
         verify(eventRepository).deleteById(eventId);
     }
 }
+

@@ -22,6 +22,7 @@ import com.example.Event_Manager.models.event.service.EventService;
 import com.example.Event_Manager.models.city.City;
 import com.example.Event_Manager.models.country.Country;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,6 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Unit Tests for Event Creation")
 public class CreateEventTest {
 
     @Mock
@@ -136,6 +138,7 @@ public class CreateEventTest {
     }
 
     @Test
+    @DisplayName("Should create event successfully")
     void createEvent_Success() {
         // Given
         LocalDateTime eventDate = eventDTO.date();
@@ -171,6 +174,7 @@ public class CreateEventTest {
     }
 
     @Test
+    @DisplayName("Should throw RequestEmptyException when request is null")
     void createEvent_NullRequest_ThrowsException() {
         // Given
         doThrow(new RequestEmptyException("Request cannot be null"))
@@ -188,6 +192,7 @@ public class CreateEventTest {
     }
 
     @Test
+    @DisplayName("Should throw EventNotFoundException when category is not found")
     void createEvent_CategoryNotFound_ThrowsEventNotFoundException() {
         // Given
         doNothing().when(eventValidation).checkIfRequestNotNull(any(CreateEventDTO.class));
@@ -207,6 +212,7 @@ public class CreateEventTest {
     }
 
     @Test
+    @DisplayName("Should throw EventNotFoundException when venue is not found")
     void createEvent_VenueNotFound_ThrowsEventNotFoundException() {
         // Given
         doNothing().when(eventValidation).checkIfRequestNotNull(any(CreateEventDTO.class));
