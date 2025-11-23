@@ -1,5 +1,6 @@
 package com.example.Event_Manager.models.event.dto.request;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,8 +15,13 @@ public record UpdateEventDTO(
         @Size(max = 500, message = "Description must not exceed 500 characters")
         String description,
 
+        @NotNull(message = "Event start date is required")
         @FutureOrPresent
-        LocalDateTime date,
+        LocalDateTime startDate,
+
+        @NotNull(message = "Event end date is required")
+        @FutureOrPresent
+        LocalDateTime endDate,
 
         @NotNull(message = "Venue ID is required")
         Long venueId,

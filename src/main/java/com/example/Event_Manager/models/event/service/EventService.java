@@ -8,6 +8,7 @@ import com.example.Event_Manager.models.event.dto.request.CreateEventDTO;
 import com.example.Event_Manager.models.event.dto.request.UpdateEventDTO;
 import com.example.Event_Manager.models.event.dto.response.EventDTO;
 import com.example.Event_Manager.models.event.dto.response.EventSummaryDTO;
+import com.example.Event_Manager.models.event.enums.Status;
 import com.example.Event_Manager.models.event.exceptions.EventNotFoundException;
 import com.example.Event_Manager.models.event.mapper.EventMapper;
 import com.example.Event_Manager.models.event.repository.EventRepository;
@@ -52,6 +53,8 @@ public class EventService implements IEventService {
         venueValidation.checkIfObjectExist(venue);
 
         Event event = eventMapper.toEntity(eventDTO, category, venue);
+        event.setStatus(Status.PUBLISHED);
+
         Event savedEvent = eventRepository.save(event);
 
         return eventMapper.toDTO(savedEvent);

@@ -5,7 +5,6 @@ import com.example.Event_Manager.models.event.dto.request.UpdateEventDTO;
 import com.example.Event_Manager.models.event.dto.response.EventDTO;
 import com.example.Event_Manager.models.event.dto.response.EventSummaryDTO;
 import com.example.Event_Manager.models.event.service.EventService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ public class EventController implements EventApi {
 
     @PostMapping
     public ResponseEntity<EventDTO> createEvent(
-            @Valid @RequestBody CreateEventDTO createEventDTO
+            @RequestBody CreateEventDTO createEventDTO
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.createEvent(createEventDTO));
     }
@@ -34,7 +33,7 @@ public class EventController implements EventApi {
     @PutMapping("/{id}")
     public ResponseEntity<EventDTO> updateEvent(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateEventDTO updateEventDTO
+            @RequestBody UpdateEventDTO updateEventDTO
     ) {
         return ResponseEntity.ok(eventService.updateEvent(id, updateEventDTO));
     }

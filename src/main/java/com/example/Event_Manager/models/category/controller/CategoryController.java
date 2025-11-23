@@ -23,14 +23,14 @@ public class CategoryController implements CategoryApi {
     private final ICategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CreateCategoryDTO createCategoryDTO) {
+    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CreateCategoryDTO createCategoryDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(createCategoryDTO));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDTO> updateCategory(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateCategoryDTO updateCategoryDTO
+            @RequestBody UpdateCategoryDTO updateCategoryDTO
     ) {
         return ResponseEntity.ok(categoryService.updateCategory(id, updateCategoryDTO));
     }

@@ -4,6 +4,7 @@ import com.example.Event_Manager.models._util.ErrorResponse;
 import com.example.Event_Manager.models._util.RequestEmptyException;
 import com.example.Event_Manager.models.category.exceptions.CategoryAlreadyExistsException;
 import com.example.Event_Manager.models.category.exceptions.CategoryNotFoundException;
+import com.example.Event_Manager.models.category.exceptions.InvalidCategoryException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,5 +43,15 @@ public class CategoryControllerAdvice {
                 LocalDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(InvalidCategoryException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCategoryException(InvalidCategoryException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }

@@ -14,9 +14,13 @@ public record CreateEventDTO(
         @Size(max = 500, message = "Description must not exceed 500 characters")
         String description,
 
-        @NotNull(message = "Event date is required")
+        @NotNull(message = "Event start date is required")
         @Future
-        LocalDateTime date,
+        LocalDateTime startDate,
+
+        @NotNull(message = "Event end date is required")
+        @Future
+        LocalDateTime endDate,
 
         @NotNull(message = "Venue id is required")
         Long venueId,

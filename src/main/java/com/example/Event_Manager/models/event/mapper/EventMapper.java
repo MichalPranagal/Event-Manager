@@ -31,8 +31,8 @@ public interface EventMapper {
     @Mapping(target = "organizer", ignore = true)
     @Mapping(source = "dto.name", target = "name")
     @Mapping(source = "dto.description", target = "description")
-    @Mapping(source = "dto.date", target = "startTime")
-    @Mapping(target = "endTime", ignore = true)
+    @Mapping(source = "dto.startDate", target = "startTime")
+    @Mapping(source = "dto.endDate", target = "endTime")
     @Mapping(source = "category", target = "category")
     @Mapping(source = "venue", target = "venue")
     Event toEntity(CreateEventDTO dto, Category category, Venue venue);
@@ -47,8 +47,8 @@ public interface EventMapper {
     @Mapping(target = "organizer", ignore = true)
     @Mapping(source = "dto.name", target = "name")
     @Mapping(source = "dto.description", target = "description")
-    @Mapping(source = "dto.date", target = "startTime")
-    @Mapping(target = "endTime", ignore = true)
+    @Mapping(source = "dto.startDate", target = "startTime")
+    @Mapping(source = "dto.endDate", target = "endTime")
     @Mapping(source = "category", target = "category")
     @Mapping(source = "venue", target = "venue")
     void updateEntity(@MappingTarget Event event, UpdateEventDTO dto, Category category, Venue venue);
