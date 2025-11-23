@@ -7,11 +7,14 @@ import com.example.Event_Manager.models.event.dto.response.EventSummaryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Tag(name = "Event Management", description = "APIs for managing events")
 public interface EventApi {
     @Operation(summary = "Create a new event",
             description = "Allows an authenticated user to create a new event.")
@@ -82,4 +85,12 @@ public interface EventApi {
             @ApiResponse(responseCode = "404", description = "Event not found")
     })
     ResponseEntity<EventSummaryDTO> getEventSummary(Long eventId);
+
+    @Operation(summary = "Get events by organizer name",
+            description = "Retrieves events by organizer name.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Events retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No events found for the given organizer name")
+    })
+    ResponseEntity<List<EventDTO>> getEventsByOrganizer(String organizerName);
 }

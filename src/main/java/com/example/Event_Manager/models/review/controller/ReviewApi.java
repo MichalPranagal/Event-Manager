@@ -8,10 +8,12 @@ import com.example.Event_Manager.models.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
+@Tag(name = "Review Management", description = "APIs for managing event reviews")
 public interface ReviewApi {
 
     @Operation(summary = "Create a new review for an event",

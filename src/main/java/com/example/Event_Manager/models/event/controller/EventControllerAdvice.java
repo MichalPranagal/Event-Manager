@@ -1,9 +1,11 @@
 package com.example.Event_Manager.models.event.controller;
 
 
+import com.example.Event_Manager.models._util.RequestEmptyException;
 import com.example.Event_Manager.models.category.exceptions.CategoryNotFoundException;
 import com.example.Event_Manager.models.event.exceptions.*;
 import com.example.Event_Manager.models._util.ErrorResponse;
+import com.example.Event_Manager.models.user.exceptions.UserNotFoundException;
 import com.example.Event_Manager.models.venue.exceptions.VenueNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -113,5 +115,25 @@ public class EventControllerAdvice {
                 LocalDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(RequestEmptyException.class)
+    public ResponseEntity<ErrorResponse> handleRequestEmpty(RequestEmptyException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }

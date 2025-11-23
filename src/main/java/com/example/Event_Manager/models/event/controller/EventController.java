@@ -100,4 +100,10 @@ public class EventController implements EventApi {
             @PathVariable Long eventId) {
         return ResponseEntity.ok(eventService.getEventSummary(eventId));
     }
+
+    @GetMapping("/organizer/name/{organizerName}")
+    public ResponseEntity<List<EventDTO>> getEventsByOrganizer(
+            @PathVariable String organizerName) {
+        return ResponseEntity.ok(eventService.getEventsByOrganizer(organizerName));
+    }
 }

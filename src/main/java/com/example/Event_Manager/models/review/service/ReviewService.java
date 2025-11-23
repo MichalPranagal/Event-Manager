@@ -9,6 +9,7 @@ import com.example.Event_Manager.models.review.dto.request.CreateReviewDTO;
 import com.example.Event_Manager.models.review.dto.request.UpdateReviewDTO;
 import com.example.Event_Manager.models.review.dto.response.ReviewDTO;
 import com.example.Event_Manager.models.review.dto.response.ReviewSummaryDTO;
+import com.example.Event_Manager.models.review.exceptions.ReviewNotFoundException;
 import com.example.Event_Manager.models.review.mapper.ReviewMapper;
 import com.example.Event_Manager.models.review.repository.ReviewRepository;
 import com.example.Event_Manager.models.review.validation.ReviewValidation;
@@ -57,7 +58,8 @@ public class ReviewService implements IReviewService {
     public ReviewDTO updateReview(Long reviewId, UpdateReviewDTO reviewRequest, Long userId) {
         reviewValidation.checkIfRequestNotNull(reviewRequest);
         reviewValidation.checkIfIdValid(reviewId);
-        var review = reviewRepository.getReviewById(reviewId);
+        Review review = reviewRepository.getReviewById(reviewId)
+            .orElseThrow(() -> new ReviewNotFoundException("Review not found"));
         reviewValidation.checkIfObjectExist(review);
 
         reviewMapper.updateEntity(review, reviewRequest);
@@ -79,10 +81,9 @@ public class ReviewService implements IReviewService {
     public List<ReviewDTO> getReviewsForEvent(Long eventId) {
         eventValidation.checkIfIdValid(eventId);
         var reviews = reviewRepository.findByEventId(eventId);
-        // aby nie przechodzic po calej kolekcji
-        reviewValidation.checkIfObjectExist(reviews.getFirst());
-        reviewValidation.checkIfObjectExist(reviews.getLast());
-
+        if (reviews == null || reviews.isEmpty()) {
+            throw new ReviewNotFoundException("No reviews found for event with id: " + eventId);
+        }
         return reviews.stream()
                 .map(reviewMapper::toDTO)
                 .toList();
@@ -93,8 +94,9 @@ public class ReviewService implements IReviewService {
         eventValidation.checkIfIdValid(eventId);
 
         var reviews = reviewRepository.findByEventId(eventId);
-        reviewValidation.checkIfObjectExist(reviews.getFirst());
-        reviewValidation.checkIfObjectExist(reviews.getLast());
+        if (reviews == null || reviews.isEmpty()) {
+            throw new ReviewNotFoundException("No reviews summary found for event with id: " + eventId);
+        }
 
         double averageRating = reviews.stream()
                 .mapToInt(Review::getRating)

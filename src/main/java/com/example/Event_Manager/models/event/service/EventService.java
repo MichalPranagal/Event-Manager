@@ -43,7 +43,7 @@ public class EventService implements IEventService {
     public EventDTO createEvent(CreateEventDTO eventDTO) {
         eventValidation.checkIfRequestNotNull(eventDTO);
 
-        Category category = categoryRepository.findById(Math.toIntExact(eventDTO.categoryId()))
+        Category category = categoryRepository.findById(eventDTO.categoryId())
                 .orElseThrow(() -> new EventNotFoundException("Category not found"));
         categoryValidation.checkIfObjectExist(category);
 
@@ -67,7 +67,7 @@ public class EventService implements IEventService {
                 .orElseThrow(() -> new EventNotFoundException("Event with this id is not in database."));
         eventValidation.checkIfObjectExist(eventToUpdate);
 
-        Category category = categoryRepository.findById(Math.toIntExact(eventDTO.categoryId()))
+        Category category = categoryRepository.findById(eventDTO.categoryId())
                 .orElseThrow(() -> new EventNotFoundException("Category not found"));
         categoryValidation.checkIfObjectExist(category);
 
@@ -101,7 +101,11 @@ public class EventService implements IEventService {
 
     @Override
     public List<EventDTO> getAllEvents() {
-        return eventRepository.findAll().stream()
+        List<Event> events = eventRepository.findAll();
+        if (events == null || events.isEmpty()) {
+            throw new EventNotFoundException("No events found in database.");
+        }
+        return events.stream()
                 .map(eventMapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -109,8 +113,13 @@ public class EventService implements IEventService {
     @Override
     public List<EventDTO> getEventsByCategory(Long categoryId) {
         categoryValidation.checkIfIdValid(categoryId);
-        return eventRepository.findAll().stream()
+        List<Event> events = eventRepository.findAll().stream()
                 .filter(event -> event.getCategory().getId().equals(categoryId))
+                .toList();
+        if (events.isEmpty()) {
+            throw new EventNotFoundException("No events found for category with id: " + categoryId);
+        }
+        return events.stream()
                 .map(eventMapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -118,28 +127,41 @@ public class EventService implements IEventService {
     @Override
     public List<EventDTO> getEventsByVenue(Long venueId) {
         venueValidation.checkIfIdValid(venueId);
-        return eventRepository.findAll().stream()
+        List<Event> events = eventRepository.findAll().stream()
                 .filter(event -> event.getVenue().getId().equals(venueId))
+                .toList();
+        if (events.isEmpty()) {
+            throw new EventNotFoundException("No events found for venue with id: " + venueId);
+        }
+        return events.stream()
                 .map(eventMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<EventDTO> getEventsByDateRange(LocalDateTime start, LocalDateTime end) {
-        // aby zamienic LocalDateTime na Date
         Date startDate = Date.from(start.atZone(ZoneId.systemDefault()).toInstant());
         Date endDate = Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
-
-        return eventRepository.findAll().stream()
+        List<Event> events = eventRepository.findAll().stream()
                 .filter(event -> !event.getStartTime().before(startDate) && !event.getStartTime().after(endDate))
+                .toList();
+        if (events.isEmpty()) {
+            throw new EventNotFoundException("No events found in date range.");
+        }
+        return events.stream()
                 .map(eventMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<EventDTO> searchEventsByName(String name) {
-        return eventRepository.findAll().stream()
+        List<Event> events = eventRepository.findAll().stream()
                 .filter(event -> event.getName().toLowerCase().contains(name.toLowerCase()))
+                .toList();
+        if (events.isEmpty()) {
+            throw new EventNotFoundException("No events found with name containing: " + name);
+        }
+        return events.stream()
                 .map(eventMapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -149,8 +171,13 @@ public class EventService implements IEventService {
         if (organizerId == null || organizerId <= 0) {
             throw new UserNotFoundException("Organizer ID is not valid.");
         }
-        return eventRepository.findAll().stream()
+        List<Event> events = eventRepository.findAll().stream()
                 .filter(event -> event.getOrganizer() != null && event.getOrganizer().getId().equals(organizerId))
+                .toList();
+        if (events.isEmpty()) {
+            throw new EventNotFoundException("No events found for organizer with id: " + organizerId);
+        }
+        return events.stream()
                 .map(eventMapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -161,5 +188,24 @@ public class EventService implements IEventService {
         Event event = eventRepository.findEventById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event not found in database."));
         return eventMapper.toSummaryDTO(event);
+    }
+
+    @Override
+    public List<EventDTO> getEventsByOrganizer(String organizerName) {
+        if (organizerName == null || organizerName.trim().isEmpty()) {
+            throw new UserNotFoundException("Organizer name cannot be empty or blank.");
+        }
+        String normalizedName = organizerName.trim();
+        List<Event> events = eventRepository.findAll().stream()
+                .filter(event -> event.getOrganizer() != null &&
+                        event.getOrganizer().getFullName() != null &&
+                        event.getOrganizer().getFullName().equalsIgnoreCase(normalizedName))
+                .toList();
+        if (events.isEmpty()) {
+            throw new EventNotFoundException("No events found for organizer with name: '" + normalizedName + "'.");
+        }
+        return events.stream()
+                .map(eventMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

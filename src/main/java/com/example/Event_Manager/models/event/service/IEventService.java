@@ -22,5 +22,6 @@ public interface IEventService {
     List<EventDTO> getEventsByOrganizer(Long organizerId);
 
     EventSummaryDTO getEventSummary(Long eventId);
+    List<EventDTO> getEventsByOrganizer(String organizerName);
 
 }
