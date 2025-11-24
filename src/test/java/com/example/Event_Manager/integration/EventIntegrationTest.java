@@ -1,6 +1,7 @@
 package com.example.Event_Manager.integration;
 
 import com.example.Event_Manager.auth.repository.UserRepository;
+import com.example.Event_Manager.auth.util.JwtUtil;
 import com.example.Event_Manager.models.category.Category;
 import com.example.Event_Manager.models.category.repository.CategoryRepository;
 import com.example.Event_Manager.models.event.dto.request.CreateEventDTO;
@@ -31,12 +32,14 @@ import java.time.LocalDateTime;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-integration.properties")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
 public class EventIntegrationTest {
+
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -48,13 +51,20 @@ public class EventIntegrationTest {
     private CategoryRepository categoryRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     private Long venueId;
     private Long categoryId;
+    private User organizer;
+    private String organizerToken;
 
     @BeforeAll
     void setup() {
-        User organizer = User.builder()
+        userRepository.deleteAll();
+        venueRepository.deleteAll();
+        categoryRepository.deleteAll();
+        organizer = User.builder()
                 .firstName("Organizer")
                 .lastName("Test")
                 .email("organizer@test.com")
@@ -63,15 +73,14 @@ public class EventIntegrationTest {
                 .role(Role.ORGANIZER)
                 .status(Status.ACTIVE)
                 .build();
-        Long organizerId = userRepository.save(organizer).getId();
-
+        userRepository.save(organizer);
+        organizerToken = jwtUtil.generateToken(organizer);
         Venue venue = Venue.builder()
                 .name("Test Venue")
                 .address("123 Test Street")
                 .description("A place for tests")
                 .build();
         venueId = venueRepository.save(venue).getId();
-
         Category category = Category.builder()
                 .name("Test Category")
                 .description("Category for integration test")
@@ -97,6 +106,7 @@ public class EventIntegrationTest {
         CreateEventDTO createEventDTO = getSampleEventDTO("Test Event");
         String json = objectMapper.writeValueAsString(createEventDTO);
         String response = mockMvc.perform(MockMvcRequestBuilders.post("/api/events")
+                        .header("Authorization", "Bearer " + organizerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -112,15 +122,14 @@ public class EventIntegrationTest {
         CreateEventDTO createEventDTO = getSampleEventDTO("Event to update");
         String json = objectMapper.writeValueAsString(createEventDTO);
         String response = mockMvc.perform(MockMvcRequestBuilders.post("/api/events")
+                        .header("Authorization", "Bearer " + organizerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         Long eventId = objectMapper.readTree(response).get("id").asLong();
-
         LocalDateTime newStartTime = LocalDateTime.now().plusDays(3);
         LocalDateTime newEndTime = newStartTime.plusHours(2);
-
         UpdateEventDTO updateEventDTO = new UpdateEventDTO(
                 "Updated Event",
                 "Nowy opis",
@@ -131,6 +140,7 @@ public class EventIntegrationTest {
         );
         String updateJson = objectMapper.writeValueAsString(updateEventDTO);
         mockMvc.perform(MockMvcRequestBuilders.put("/api/events/" + eventId)
+                        .header("Authorization", "Bearer " + organizerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateJson))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -142,12 +152,14 @@ public class EventIntegrationTest {
         CreateEventDTO createEventDTO = getSampleEventDTO("Delete Event");
         String json = objectMapper.writeValueAsString(createEventDTO);
         String response = mockMvc.perform(MockMvcRequestBuilders.post("/api/events")
+                        .header("Authorization", "Bearer " + organizerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         Long eventId = objectMapper.readTree(response).get("id").asLong();
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/events/" + eventId))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/events/" + eventId)
+                        .header("Authorization", "Bearer " + organizerToken))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
         mockMvc.perform(MockMvcRequestBuilders.get("/api/events/" + eventId))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -158,6 +170,7 @@ public class EventIntegrationTest {
         CreateEventDTO createEventDTO = getSampleEventDTO("Event1");
         String json = objectMapper.writeValueAsString(createEventDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/events")
+                        .header("Authorization", "Bearer " + organizerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
@@ -178,12 +191,13 @@ public class EventIntegrationTest {
         CreateEventDTO createEventDTO = getSampleEventDTO("Category Event");
         String json = objectMapper.writeValueAsString(createEventDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/events")
+                        .header("Authorization", "Bearer " + organizerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
         mockMvc.perform(MockMvcRequestBuilders.get("/api/events/category/" + categoryId))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].category.id").value(categoryId));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Category Event"));
     }
 
     @Test
@@ -191,6 +205,7 @@ public class EventIntegrationTest {
         CreateEventDTO createEventDTO = getSampleEventDTO("Venue Event");
         String json = objectMapper.writeValueAsString(createEventDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/events")
+                        .header("Authorization", "Bearer " + organizerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
@@ -204,6 +219,7 @@ public class EventIntegrationTest {
         CreateEventDTO createEventDTO = getSampleEventDTO("DateRange Event");
         String json = objectMapper.writeValueAsString(createEventDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/events")
+                        .header("Authorization", "Bearer " + organizerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
@@ -221,6 +237,7 @@ public class EventIntegrationTest {
         CreateEventDTO createEventDTO = getSampleEventDTO("Searchable Event");
         String json = objectMapper.writeValueAsString(createEventDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/events")
+                        .header("Authorization", "Bearer " + organizerToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isCreated());

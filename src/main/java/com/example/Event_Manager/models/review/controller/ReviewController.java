@@ -1,5 +1,6 @@
 package com.example.Event_Manager.models.review.controller;
 
+import com.example.Event_Manager.models._util.annotations.IsAttendee;
 import com.example.Event_Manager.models.review.dto.request.CreateReviewDTO;
 import com.example.Event_Manager.models.review.dto.request.UpdateReviewDTO;
 import com.example.Event_Manager.models.review.dto.response.ReviewDTO;
@@ -24,6 +25,7 @@ public class ReviewController implements ReviewApi {
     private final IReviewService reviewService;
 
     @PostMapping
+    @IsAttendee
     public ResponseEntity<ReviewDTO> createReview(
             @RequestBody CreateReviewDTO createReviewDTO,
             @AuthenticationPrincipal User user
@@ -33,6 +35,7 @@ public class ReviewController implements ReviewApi {
     }
 
     @PutMapping("/{reviewId}")
+    @IsAttendee
     public ResponseEntity<ReviewDTO> updateReview(
             @PathVariable Long reviewId,
             @RequestBody UpdateReviewDTO updateReviewDTO,
@@ -44,6 +47,7 @@ public class ReviewController implements ReviewApi {
 
 
     @DeleteMapping("/{reviewId}")
+    @IsAttendee
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long reviewId,
             @AuthenticationPrincipal User user

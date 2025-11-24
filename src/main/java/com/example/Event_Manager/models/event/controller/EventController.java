@@ -1,5 +1,6 @@
 package com.example.Event_Manager.models.event.controller;
 
+import com.example.Event_Manager.models._util.annotations.IsOrganizer;
 import com.example.Event_Manager.models.event.dto.request.CreateEventDTO;
 import com.example.Event_Manager.models.event.dto.request.UpdateEventDTO;
 import com.example.Event_Manager.models.event.dto.response.EventDTO;
@@ -23,6 +24,7 @@ public class EventController implements EventApi {
     private final EventService eventService;
 
     @PostMapping
+    @IsOrganizer
     public ResponseEntity<EventDTO> createEvent(
             @RequestBody CreateEventDTO createEventDTO
     ) {
@@ -30,6 +32,7 @@ public class EventController implements EventApi {
     }
 
     @PutMapping("/{id}")
+    @IsOrganizer
     public ResponseEntity<EventDTO> updateEvent(
             @PathVariable Long id,
             @RequestBody UpdateEventDTO updateEventDTO
@@ -38,6 +41,7 @@ public class EventController implements EventApi {
     }
 
     @DeleteMapping("/{id}")
+    @IsOrganizer
     public ResponseEntity<Void> deleteEvent(
             @PathVariable Long id
     ) {

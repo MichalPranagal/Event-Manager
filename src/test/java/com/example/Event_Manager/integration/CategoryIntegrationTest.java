@@ -1,5 +1,10 @@
 package com.example.Event_Manager.integration;
 
+import com.example.Event_Manager.auth.repository.UserRepository;
+import com.example.Event_Manager.auth.util.JwtUtil;
+import com.example.Event_Manager.models.user.User;
+import com.example.Event_Manager.models.user.enums.Role;
+import com.example.Event_Manager.models.user.enums.Status;
 import com.example.Event_Manager.models.category.Category;
 import com.example.Event_Manager.models.category.dto.request.CreateCategoryDTO;
 import com.example.Event_Manager.models.category.dto.request.UpdateCategoryDTO;
@@ -27,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-integration.properties")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc()
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Transactional
@@ -42,9 +47,34 @@ public class CategoryIntegrationTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private User adminUser;
+    private String adminToken;
+
     @BeforeEach
     void setup() {
         categoryRepository.deleteAll();
+        userRepository.deleteAll();
+        adminUser = createAndSaveAdminUser("admin@event.com", "123456789");
+        adminToken = jwtUtil.generateToken(adminUser);
+    }
+
+    private User createAndSaveAdminUser(String email, String phone) {
+        User user = User.builder()
+                .firstName("Admin")
+                .lastName("User")
+                .email(email)
+                .phoneNumber(phone)
+                .password("password")
+                .role(Role.ADMIN)
+                .status(Status.ACTIVE)
+                .build();
+        return userRepository.save(user);
     }
 
     private Category createAndSaveCategory(String name, String description) {
@@ -62,6 +92,7 @@ public class CategoryIntegrationTest {
         CreateCategoryDTO createDto = new CreateCategoryDTO("Sport", "Inny opis dla kategorii sportowej");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/categories")
+                        .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isConflict());
@@ -74,6 +105,7 @@ public class CategoryIntegrationTest {
         UpdateCategoryDTO updateDto = new UpdateCategoryDTO("Sztuka Nowoczesna", "Wystawy sztuki współczesnej");
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/categories/" + category.getId())
+                        .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
@@ -86,7 +118,8 @@ public class CategoryIntegrationTest {
     void shouldDeleteCategory() throws Exception {
         Category category = createAndSaveCategory("Teatr", "Spektakle teatralne");
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/categories/" + category.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/categories/" + category.getId())
+                        .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/categories/" + category.getId()))
