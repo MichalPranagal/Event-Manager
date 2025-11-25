@@ -29,4 +29,10 @@ public class CountryService {
                 .orElseThrow(() -> new CountryNotFoundException(code));
         return countryMapper.toDTO(country);
     }
+
+    public void delete(String code) {
+        Country country = countryRepository.findById(code)
+                .orElseThrow(() -> new CountryNotFoundException(code));
+        countryRepository.delete(country);
+    }
 }

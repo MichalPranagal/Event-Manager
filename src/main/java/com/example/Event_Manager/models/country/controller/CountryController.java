@@ -7,10 +7,7 @@ import com.example.Event_Manager.models.country.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,8 +30,11 @@ public class CountryController implements CountryApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String code) {
-        return null;
+    @DeleteMapping("/{code}")
+    @IsAdmin
+    public ResponseEntity<Void> delete(@PathVariable String code) {
+        countryService.delete(code);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
