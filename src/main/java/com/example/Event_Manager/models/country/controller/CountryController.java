@@ -31,8 +31,13 @@ public class CountryController implements CountryApi {
     }
 
     @Override
-    public ResponseEntity<CountryDTO> update(String code, UpdateCountryDTO updateCountryDTO) {
-        return null;
+    @PutMapping("/{code}")
+    @IsAdmin
+    public ResponseEntity<CountryDTO> update(
+            @PathVariable String code,
+            @Valid @RequestBody UpdateCountryDTO updateCountryDTO) {
+        CountryDTO updatedCountry = countryService.update(code, updateCountryDTO);
+        return ResponseEntity.ok(updatedCountry);
     }
 
     @Override
