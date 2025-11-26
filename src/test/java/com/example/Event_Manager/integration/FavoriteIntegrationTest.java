@@ -113,7 +113,7 @@ public class FavoriteIntegrationTest {
 
     @Test
     @DisplayName("Should return list of favorites")
-    void shouldReturnFavoritesList() throws Exception {
+    void shouldReturnFavoritesPage() throws Exception {
         //dodajemy uzytkownikowi organizatora do ulubionych
         mockMvc.perform(post("/api/favorites/" + organizer.getId())
                 .header("Authorization", "Bearer " + fanToken));
@@ -122,8 +122,8 @@ public class FavoriteIntegrationTest {
         mockMvc.perform(get("/api/favorites")
                         .header("Authorization", "Bearer " + fanToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].organizerEmail", is("org@test.com")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].organizerEmail", is("org@test.com")));
     }
 
     @Test
@@ -143,8 +143,8 @@ public class FavoriteIntegrationTest {
         mockMvc.perform(get("/api/favorites")
                         .header("Authorization", "Bearer " + fanToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].organizerEmail", is("org@test.com")));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].organizerEmail", is("org@test.com")));
 
         // Weryfikujemy dodatkowo, że organizator faktycznie ma status INACTIVE w bazie
         User deletedOrg = userRepository.findById(organizer.getId()).get();

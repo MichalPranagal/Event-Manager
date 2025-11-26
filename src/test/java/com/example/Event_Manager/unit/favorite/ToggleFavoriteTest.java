@@ -2,6 +2,7 @@ package com.example.Event_Manager.unit.favorite;
 
 import com.example.Event_Manager.auth.repository.UserRepository;
 import com.example.Event_Manager.models.favorite.Favorite;
+import com.example.Event_Manager.models.favorite.exceptions.InvalidFavoriteActionException;
 import com.example.Event_Manager.models.favorite.repository.FavoriteRepository;
 import com.example.Event_Manager.models.favorite.service.FavoriteService;
 import com.example.Event_Manager.models.user.User;
@@ -79,7 +80,7 @@ public class ToggleFavoriteTest {
         Long userId = 1L;
         doNothing().when(userValidation).checkIfIdValid(any());
 
-        assertThrows(IllegalArgumentException.class, () -> favoriteService.toggleFavorite(userId, userId));
+        assertThrows(InvalidFavoriteActionException.class, () -> favoriteService.toggleFavorite(userId, userId));
         verify(favoriteRepository, never()).save(any());
     }
 
@@ -98,7 +99,7 @@ public class ToggleFavoriteTest {
         when(userRepository.findById(targetId)).thenReturn(Optional.of(target));
 
         //Then
-        assertThrows(IllegalArgumentException.class, () -> favoriteService.toggleFavorite(userId, targetId));
+        assertThrows(InvalidFavoriteActionException.class, () -> favoriteService.toggleFavorite(userId, targetId));
     }
 
     @Test
