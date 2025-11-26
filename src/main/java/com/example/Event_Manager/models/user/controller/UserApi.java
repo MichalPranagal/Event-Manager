@@ -1,6 +1,7 @@
 package com.example.Event_Manager.models.user.controller;
 
 import com.example.Event_Manager.models.user.User;
+import com.example.Event_Manager.models.user.dto.request.ChangePasswordRequest;
 import com.example.Event_Manager.models.user.dto.request.CreateUserDTO;
 import com.example.Event_Manager.models.user.dto.request.UpdateUserDTO;
 import com.example.Event_Manager.models.user.dto.response.UserDTO;
@@ -17,6 +18,9 @@ public interface UserApi {
 
     @Operation(summary = "Update current user")
     ResponseEntity<UserDTO> updateUser(User user, @Valid UpdateUserDTO updateDTO);
+
+    @Operation(summary = "Change password")
+    ResponseEntity<Void> changePassword(User user, @Valid ChangePasswordRequest request);
 
     @Operation(summary = "Create new user only Admin")
     ResponseEntity<UserDTO> createUser(@Valid CreateUserDTO createDTO);

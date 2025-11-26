@@ -16,7 +16,6 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "authorities", ignore = true)
     @Mapping(target = "reviews", ignore = true)
     @Mapping(target = "favorite", ignore = true)
     @Mapping(target = "interestedUsers", ignore = true)
