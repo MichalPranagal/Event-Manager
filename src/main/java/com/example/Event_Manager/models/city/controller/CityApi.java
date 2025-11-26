@@ -18,11 +18,13 @@ import java.util.List;
 @Tag(name = "City Management", description = "APIs for managing cities")
 public interface CityApi {
     @Operation(summary = "Get all cities",
-            description = "Retrieves all cities with optional filtering by name.")
+            description = "Retrieves all cities with optional filtering by name and countries.")
     @ApiResponse(responseCode = "200", description = "Cities retrieved successfully")
     ResponseEntity<List<CityDTO>> getAll(
             @Parameter(description = "Filter cities by name (case-insensitive partial match)")
-            String name
+            String name,
+            @Parameter(description = "Filter cities by country codes (comma-separated, e.g., PL,DE)")
+            List<String> countries
     );
 
     @Operation(summary = "Get city by ID",

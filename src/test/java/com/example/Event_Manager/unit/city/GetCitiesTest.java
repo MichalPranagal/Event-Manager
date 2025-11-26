@@ -64,12 +64,10 @@ public class GetCitiesTest {
         when(cityRepository.findAll()).thenReturn(List.of(city));
         when(cityMapper.toDTO(city)).thenReturn(cityDTO);
 
-        List<CityDTO> result = cityService.getAll(null);
+        List<CityDTO> result = cityService.getAll(null, null);
 
         assertEquals(1, result.size());
-        assertEquals(cityDTO.id(), result.getFirst().id());
-        assertEquals(cityDTO.name(), result.getFirst().name());
-        assertEquals(cityDTO.country(), result.getFirst().country());
+        assertEquals(cityDTO, result.getFirst());
         verify(cityRepository).findAll();
         verify(cityMapper).toDTO(city);
     }
@@ -79,7 +77,7 @@ public class GetCitiesTest {
     void getAll_whenNoCitiesExist_returnsEmptyList() {
         when(cityRepository.findAll()).thenReturn(Collections.emptyList());
 
-        List<CityDTO> result = cityService.getAll(null);
+        List<CityDTO> result = cityService.getAll(null, null);
 
         assertTrue(result.isEmpty());
         verify(cityRepository).findAll();
@@ -93,7 +91,7 @@ public class GetCitiesTest {
         when(cityRepository.findByNameContainingIgnoreCase(nameFilter)).thenReturn(List.of(city));
         when(cityMapper.toDTO(city)).thenReturn(cityDTO);
 
-        List<CityDTO> result = cityService.getAll(nameFilter);
+        List<CityDTO> result = cityService.getAll(nameFilter, null);
 
         assertEquals(1, result.size());
         assertEquals(cityDTO, result.getFirst());
@@ -107,11 +105,45 @@ public class GetCitiesTest {
         String nameFilter = "Berlin";
         when(cityRepository.findByNameContainingIgnoreCase(nameFilter)).thenReturn(Collections.emptyList());
 
-        List<CityDTO> result = cityService.getAll(nameFilter);
+        List<CityDTO> result = cityService.getAll(nameFilter, null);
 
         assertTrue(result.isEmpty());
         verify(cityRepository).findByNameContainingIgnoreCase(nameFilter);
         verify(cityMapper, never()).toDTO(any());
+    }
+
+    @Test
+    @DisplayName("Should return filtered list when countries parameter is provided")
+    void getAll_withCountriesFilter_returnsFilteredCityList() {
+        List<String> countriesFilter = List.of("PL", "DE");
+
+        when(cityRepository.findByCountry_CodeIn(countriesFilter)).thenReturn(List.of(city));
+        when(cityMapper.toDTO(city)).thenReturn(cityDTO);
+
+        List<CityDTO> result = cityService.getAll(null, countriesFilter);
+
+        assertEquals(1, result.size());
+        assertEquals(cityDTO, result.getFirst());
+        verify(cityRepository).findByCountry_CodeIn(countriesFilter);
+        verify(cityMapper).toDTO(city);
+    }
+
+    @Test
+    @DisplayName("Should return filtered list when both name and countries parameters are provided")
+    void getAll_withNameAndCountriesFilter_returnsFilteredCityList() {
+        String nameFilter = "War";
+        List<String> countriesFilter = List.of("PL");
+
+        when(cityRepository.findByNameContainingIgnoreCaseAndCountry_CodeIn(nameFilter, countriesFilter))
+                .thenReturn(List.of(city));
+        when(cityMapper.toDTO(city)).thenReturn(cityDTO);
+
+        List<CityDTO> result = cityService.getAll(nameFilter, countriesFilter);
+
+        assertEquals(1, result.size());
+        assertEquals(cityDTO, result.getFirst());
+        verify(cityRepository).findByNameContainingIgnoreCaseAndCountry_CodeIn(nameFilter, countriesFilter);
+        verify(cityMapper).toDTO(city);
     }
 }
 

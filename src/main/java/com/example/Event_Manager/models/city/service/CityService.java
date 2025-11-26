@@ -24,10 +24,20 @@ public class CityService {
     private final CountryRepository countryRepository;
     private final CityMapper cityMapper;
 
-    public List<CityDTO> getAll(String name) {
-        List<City> cities = name != null && !name.isBlank()
-                ? cityRepository.findByNameContainingIgnoreCase(name)
-                : cityRepository.findAll();
+    public List<CityDTO> getAll(String name, List<String> countries) {
+        boolean hasName = name != null && !name.isBlank();
+        boolean hasCountries = countries != null && !countries.isEmpty();
+
+        List<City> cities;
+        if (hasName && hasCountries) {
+            cities = cityRepository.findByNameContainingIgnoreCaseAndCountry_CodeIn(name, countries);
+        } else if (hasName) {
+            cities = cityRepository.findByNameContainingIgnoreCase(name);
+        } else if (hasCountries) {
+            cities = cityRepository.findByCountry_CodeIn(countries);
+        } else {
+            cities = cityRepository.findAll();
+        }
 
         return cities.stream()
                 .map(cityMapper::toDTO)

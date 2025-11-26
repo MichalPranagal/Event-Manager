@@ -24,8 +24,10 @@ public class CityController implements CityApi {
 
     @Override
     @GetMapping
-    public ResponseEntity<List<CityDTO>> getAll(@RequestParam(required = false) String name) {
-        return ResponseEntity.ok(cityService.getAll(name));
+    public ResponseEntity<List<CityDTO>> getAll(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) List<String> countries) {
+        return ResponseEntity.ok(cityService.getAll(name, countries));
     }
 
     @Override
